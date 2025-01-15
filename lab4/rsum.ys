@@ -1,0 +1,41 @@
+# As you've got familiar with Y86 after writting your first y86 code
+# (bubble.ys), this code is left blank for you :)
+
+# Execution begins at address 0 
+	.pos 0
+	irmovq stack, %rsp  	# Set up stack pointer
+	call main		# Execute main program
+	halt			# Terminate program 
+
+# Array of 4 elements
+	.align 8
+list_ptr:
+        ele1:
+                .quad 0x00d
+                .quad ele2
+        ele2:
+                .quad 0x0e0
+                .quad ele3
+        ele3:
+                .quad 0xf00
+                .quad 0
+
+main:	irmovq list_ptr,%rdi
+	call sum
+	ret
+        
+# list_ptr ls in %rdi
+sum:	pushq %rbx
+        irmovq $0x0,%rax
+        andq %rdi,%rdi
+        je   false
+        mrmovq (%rdi),%rbx    
+	mrmovq 0x8(%rdi),%rdi
+        call sum
+        addq %rbx,%rax	          
+false:	popq %rbx
+        ret        # Return
+
+# Stack starts here and grows to lower addresses
+	.pos 0x200
+stack:

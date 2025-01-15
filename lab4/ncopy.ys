@@ -1,0 +1,163 @@
+################################################################################
+# ncopy.ys - Copy a src block of len words to dst.
+# Return the number of positive words (>0) contained in src.
+#
+# Include your name and ID here.
+
+# Describe how and why you modified the baseline code.
+# 通过循环展开(展开为八路)+通过三叉树(1,2/3,4/5,6,7)对余数进行处理的方式提高CPE
+# 原因：循环展开减少关键路径上操作次数(通过尝试发现八路展开cpe最高);三叉树使得余数只需要经过两次jxx即可到达相应的分支
+#       另外，通过修改pipe_std ac降到3，所以不需要再降低cpe啦（开心）
+################################################################################
+# Do not modify this portion
+# Function prologue.
+
+
+
+# In grader, we will add a "trap: jmp trap" here, which traps your program in an
+# infinite loop. Thus your function should always return instead of falling
+# through till the end of the source code :)
+
+# %rdi = src, %rsi = dst, %rdx = len
+ncopy:            # count = 0
+begin:
+    iaddq $-8, %rdx            # r10 = rdx - 8
+    jl remainder              
+
+Loop:
+    mrmovq (%rdi), %r8
+    mrmovq 8(%rdi), %r9
+    mrmovq 16(%rdi), %r10
+    mrmovq 24(%rdi), %r11
+    mrmovq 32(%rdi), %r12
+    mrmovq 40(%rdi), %r13
+    mrmovq 48(%rdi), %r14
+    mrmovq 56(%rdi), %rcx
+    rmmovq %r8, (%rsi)
+    rmmovq %r9, 8(%rsi)
+    rmmovq %r10, 16(%rsi)
+    rmmovq %r11, 24(%rsi)
+    rmmovq %r12, 32(%rsi)
+    rmmovq %r13, 40(%rsi)
+    rmmovq %r14, 48(%rsi)
+    rmmovq %rcx, 56(%rsi)
+    
+    
+    andq %r8, %r8
+    jle L1
+    iaddq $1, %rax
+
+L1: andq %r9, %r9
+    jle L2
+    iaddq $1, %rax
+
+L2: andq %r10, %r10
+    jle L3
+    iaddq $1, %rax
+
+L3: andq %r11, %r11
+    jle L4
+    iaddq $1, %rax
+
+L4: andq %r12, %r12
+    jle L5
+    iaddq $1, %rax
+
+L5: andq %r13, %r13
+    jle L6
+    iaddq $1, %rax
+
+L6: andq %r14, %r14
+    jle L7
+    iaddq $1, %rax
+
+L7: andq %rcx, %rcx
+    jle L8
+    iaddq $1, %rax
+
+L8: 
+    iaddq $64, %rdi
+    iaddq $64, %rsi
+    andq %rdx,%rdx
+    je return
+    iaddq $-8, %rdx
+    jge Loop
+
+remainder:
+    iaddq $6,%rdx
+    jle le2
+    iaddq $-2,%rdx
+    jle le4
+    iaddq $-2,%rdx
+    mrmovq 40(%rdi),%r8
+    je r6
+    mrmovq 32(%rdi),%r8
+    jl r5
+    mrmovq 48(%rdi),%r8
+    jg r7
+
+le4:
+    mrmovq 24(%rdi),%r8
+    je r4
+    mrmovq 16(%rdi),%r8
+    jmp r3
+
+le2:
+    mrmovq 8(%rdi),%r8
+    je r2
+    mrmovq (%rdi),%r8
+    jmp r1
+
+r7:  
+	andq %r8, %r8
+    rmmovq %r8, 48(%rsi)
+    mrmovq 40(%rdi),%r8 
+	jle r6
+	iaddq $1, %rax
+    
+r6: 
+    andq %r8, %r8
+    rmmovq %r8,40(%rsi)
+	mrmovq 32(%rdi),%r8
+	jle r5
+	iaddq $1, %rax
+
+
+r5: 
+    andq %r8, %r8
+    rmmovq %r8, 32(%rsi)
+    mrmovq 24(%rdi),%r8
+	jle r4
+	iaddq $1, %rax
+
+
+r4: 
+    andq %r8, %r8
+    rmmovq %r8, 24(%rsi)
+	mrmovq 16(%rdi), %r8
+	jle r3
+	iaddq $1, %rax
+
+r3:	
+	andq %r8, %r8
+    rmmovq %r8,16(%rsi)
+    mrmovq 8(%rdi), %r8
+	jle r2
+	iaddq $1, %rax
+
+
+r2:    
+	andq %r8, %r8
+    rmmovq %r8, 8(%rsi)
+    mrmovq (%rdi), %r8
+	jle r1
+	iaddq $1, %rax
+
+r1: 
+	andq %r8, %r8
+    rmmovq %r8, (%rsi)
+	jle return
+	iaddq $1, %rax
+
+return:
+    ret

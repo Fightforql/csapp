@@ -1,0 +1,53 @@
+#####################################################################
+# Autolab Version of the CS:APP Proxy Lab
+# Driver source files
+#
+# Copyright (c) 2004, R. Bryant and D. O'Hallaron, All rights reserved.
+# May not be used, modified, or copied without permission.
+#
+# Modified by Wang Zizhou in PKU, 2018-12
+# To add the support for IO-MUltiplexing method.
+######################################################################
+
+***********
+1. Overview
+***********
+
+This directory contains the source files for the Proxy Lab driver
+program. The proxy driver runs the student's Web proxy and a
+precompiled version of the Tiny Web server as child processes, and
+then tests the proxy by sending it HTTP GET requests for the Tiny
+server.
+
+********
+2. Files
+********
+
+What you should edit:
+Makefile
+	You can edit this file if you want to add more files such as cache.c
+proxy.c
+	The file you should edit on
+
+What you shouldn't edit:
+README
+	This file
+csapp.c
+	csapp.c are from the CS:APP text
+csapp.h
+	csapp.h are from the CS:APP text
+driver.sh
+	Driver for grading
+nop-server.py
+	Used in driver
+webdriver_test.py
+	Automated browser-based testing script (also used in driver)
+tiny
+	The tiny web server used for autograding
+
+********
+3. Autograding
+********
+
+Type `make clean && make` to get your executable "proxy", then `./driver.sh` 
+to see your scores.

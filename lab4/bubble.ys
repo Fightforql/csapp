@@ -1,0 +1,101 @@
+
+
+
+# Execution begins at address 0 
+	.pos 0
+	irmovq stack, %rsp  	# Set up stack pointer
+	call main		# Execute main program
+	halt			# Terminate program 
+
+# Array of 4 elements
+        .align 8
+array:  .quad 0xbca
+        .quad 0xcba
+        .quad 0xacb
+        .quad 0xcab
+        .quad 0xabc
+        .quad 0xbac
+
+main:	irmovq array,%rdi
+        irmovq $0x6,%rsi
+        call bubble_sort
+        ret
+
+
+
+
+bubble_sort:
+
+    pushq %rbp
+    pushq %rbx
+    pushq %rcx
+    pushq %r8
+    pushq %r9
+    pushq %r10
+    pushq %r11
+    pushq %r12
+    pushq %r13
+    pushq %r14
+
+
+    irmovq $1,%rbp
+    irmovq $8,%rbx
+    rrmovq %rsi,%r10 #count in r10
+    subq   %rbp,%r10 #count-1 in r10
+    jle    return
+loop1:
+    rrmovq %rsi,%r10
+    subq   %rbp,%r10
+    addq   %r10,%r10
+    addq   %r10,%r10
+    addq   %r10,%r10
+    addq   %rdi,%r10   #last in r10
+    rrmovq %rdi,%r8    #i in r8
+
+    jmp test
+
+loop2:
+    mrmovq (%r8),%r11
+    mrmovq 8(%r8),%r12 #*i in r11 *i+1 in r12
+    rrmovq %r12,%r14
+    subq   %r11,%r14
+    jge    false2
+swap:
+    rmmovq %r11,8(%r8)
+    rmmovq %r12,(%r8)
+
+false2:
+    addq %rbx,%r8 
+
+test:
+    rrmovq %r8,%r9
+    rrmovq %r10,%r13   # last in r13,i in r9 这样是为防止它们被改变
+    subq   %r13,%r9
+    jl    loop2
+
+
+
+false1:
+    subq %rbp,%rsi
+    rrmovq %rsi,%rcx
+    subq %rbp,%rcx
+    jg   loop1
+
+return:
+    popq %r14
+    popq %r13
+    popq %r12
+    popq %r11
+    popq %r10
+    popq %r9
+    popq %r8
+    popq %rcx
+    popq %rbx
+    popq %rbp
+    ret
+
+# Stack starts here and grows to lower addresses
+	.pos 0x200
+stack:
+
+
